@@ -82,13 +82,14 @@
                     // Adjusting lastActive time by adding 8 hours
                     const adjustedTime = new Date(item.lastActive);
                     adjustedTime.setHours(adjustedTime.getHours() + 8);
+                    const formattedDate = `${('0' + (adjustedTime.getMonth() + 1)).slice(-2)}-${('0' + adjustedTime.getDate()).slice(-2)} ${('0' + adjustedTime.getHours()).slice(-2)}:${('0' + adjustedTime.getMinutes()).slice(-2)}`;
 
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${item.alias}</td>
                         <td>${item.solutionsFound}</td>
                         <td>${item.currentIts}</td>
-                        <td>${adjustedTime.toLocaleString()}</td>
+                        <td>${formattedDate}</td>
                     `;
 			
                     tableBody.appendChild(row);
