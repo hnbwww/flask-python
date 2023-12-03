@@ -77,13 +77,20 @@
                     totalSolutions += item.solutionsFound;
                     totalIts += item.currentIts;
 
+
+			
+                    // Adjusting lastActive time by adding 8 hours
+                    const adjustedTime = new Date(item.lastActive);
+                    adjustedTime.setHours(adjustedTime.getHours() + 8);
+
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${item.alias}</td>
                         <td>${item.solutionsFound}</td>
                         <td>${item.currentIts}</td>
-                        <td>${new Date(item.lastActive+8*3600).toLocaleString()}</td>
+                        <td>${adjustedTime.toLocaleString()}</td>
                     `;
+			
                     tableBody.appendChild(row);
                 });
 
