@@ -14,17 +14,19 @@
 </head>
 <body>
     <h1 class="text-center mb-4">Qubic Pool Data</h1>
+
+
+	
     <div class="input-group mb-3">
-        <input type="text" class="form-control" id="addressInput" placeholder="Enter Address">
+        <input type="text" class="form-control" id="addressInput" placeholder="Enter Address" value="QQDGSVIXBLDOWDHSTKKUCTOHDFRAZAXITNUHOJNWSACECKGUSGSTONPDZMDI">
         <div class="input-group-append">
-            <button class="btn btn-primary" type="button" onclick="fetchData()">Search</button>
+            <button class="btn btn-primary" type="button" onclick="fetchData()">Query</button>
         </div>
     </div>
     <div class="table-responsive">
         <table class="table table-striped table-bordered table-hover">
             <thead class="thead-dark">
                 <tr>
-                    <th scope="col">Address</th>
                     <th scope="col">Alias</th>
                     <th scope="col">Solutions Found</th>
                     <th scope="col">Current Its</th>
@@ -36,7 +38,6 @@
             <tfoot>
                 <tr class="table-info">
                     <th>Total</th>
-                    <td></td>
                     <td id="totalSolutions"></td>
                     <td id="totalIts"></td>
                     <td></td>
@@ -53,6 +54,10 @@
     <script>
         async function fetchData() {
             const address = document.getElementById('addressInput').value.trim();
+			
+                //document.getElementById('address').textContent = `${address}`;
+
+			
             if (!address) {
                 alert('Please enter an address.');
                 return;
@@ -74,15 +79,23 @@
 
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${address}</td>
                         <td>${item.alias}</td>
                         <td>${item.solutionsFound}</td>
                         <td>${item.currentIts}</td>
-                        <td>${new Date(item.lastActive).toLocaleString()}</td>
+                        <td>${new Date(item.lastActive+8*3600).toLocaleString()}</td>
                     `;
                     tableBody.appendChild(row);
                 });
 
                 document.getElementById('totalSolutions').textContent = totalSolutions;
                 document.getElementById('totalIts').textContent = totalIts;
-            } catch (erro
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Fetch data on page load
+        window.onload = fetchData;
+    </script>
+</body>
+</html>
