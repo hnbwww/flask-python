@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qubic Pool Data</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="text-center mb-4">Qubic Pool Data</h1>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Alias</th>
+                    <th scope="col">Solutions Found</th>
+                    <th scope="col">Current Its</th>
+                    <th scope="col">Last Active</th>
+                </tr>
+            </thead>
+            <tbody id="poolData">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        async function fetchData() {
+            try {
+                const response = await fetch('https://flask-python-lemon.vercel.app/get_qb?ID=QQDGSVIXBLDOWDHSTKKUCTOHDFRAZAXITNUHOJNWSACECKGUSGSTONPDZMDI');
+                const data = await response.json();
+
+                const tableBody = document.querySelector('#poolData');
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.alias}</td>
+                        <td>${item.solutionsFound}</td>
+                        <td>${item.currentIts}</td>
+                        <td>${new Date(item.lastActive).toLocaleString()}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        fetchData();
+    </script>
+</body>
+</html>
