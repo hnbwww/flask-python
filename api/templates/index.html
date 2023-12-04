@@ -8,29 +8,29 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
+	    max-width: 800px;
+            margin: 0 auto;		
             padding: 20px;
         }
     </style>
 </head>
 <body>
     <h1 class="text-center mb-4">Qubic Pool Data</h1>
-
-
-	
     <div class="input-group mb-3">
         <input type="text" class="form-control" id="addressInput" placeholder="Enter Address" value="QQDGSVIXBLDOWDHSTKKUCTOHDFRAZAXITNUHOJNWSACECKGUSGSTONPDZMDI">
         <div class="input-group-append">
-            <button class="btn btn-primary" type="button" onclick="fetchData()">Query</button>
+            <button class="btn btn-primary" type="button" onclick="fetchData()">Search</button>
         </div>
     </div>
+    <h1 class="text-center mb-4" id="address"></h1>
     <div class="table-responsive">
         <table class="table table-striped table-bordered table-hover">
             <thead class="thead-dark">
                 <tr>
-                    <th scope="col">Alias</th>
-                    <th scope="col">Solutions Found</th>
-                    <th scope="col">Current Its</th>
-                    <th scope="col">Last Active</th>
+                    <th scope="col" onclick="sortTable(0)">Alias</th>
+                    <th scope="col" onclick="sortTable(1)">Solutions Found</th>
+                    <th scope="col" onclick="sortTable(2)">Current Its</th>
+                    <th scope="col" onclick="sortTable(3)">Last Active</th>
                 </tr>
             </thead>
             <tbody id="poolData">
@@ -53,57 +53,95 @@
 
     <script>
         async function fetchData() {
-            const address = document.getElementById('addressInput').value.trim();
-			
-                //document.getElementById('address').textContent = `${address}`;
+            const address = document.getElementById('addressInput').value;
 
-			
-            if (!address) {
-                alert('Please enter an address.');
-                return;
-            }
+            const response = await fetch(`https://flask-python-lemon.vercel.app/get_qb?ID=${address}`);
+            const data = await response.json();
 
-            try {
-                const response = await fetch(`https://flask-python-lemon.vercel.app/get_qb?ID=${address}`);
-                const data = await response.json();
+            const poolData = document.getElementById('poolData');
+            poolData.innerHTML = '';
 
-                const tableBody = document.querySelector('#poolData');
-                let totalSolutions = 0;
-                let totalIts = 0;
+            let totalSolutions = 0;
+            let totalIts = 0;
 
-                tableBody.innerHTML = '';
+            data.forEach(entry => {
+                const { alias, solutionsFound, currentIts, lastActive } = entry;
 
-                data.forEach(item => {
-                    totalSolutions += item.solutionsFound;
-                    totalIts += item.currentIts;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${alias}</td>
+                    <td>${solutionsFound}</td>
+                    <td>${currentIts}</td>
+                    <td>${formatDate(lastActive)}</td>
+                `;
+                poolData.appendChild(row);
+
+                totalSolutions += solutionsFound;
+                totalIts += currentIts;
+            });
+
+            document.getElementById('totalSolutions').textContent = totalSolutions;
+            document.getElementById('totalIts').textContent = totalIts;
+
+            document.getElementById('address').textContent = `Address: ${address}`;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const formattedDate = `${date.getMonth() + 1}-${('0' + date.getDate()).slice(-2)} ${('0' + date.getHours()).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}`;
+            return formattedDate;
+        }
+
+        function sortTable(columnIndex) {
+            const table = document.querySelector('table');
+            const rows = Array.from(table.querySelectorAll('tbody tr'));
+
+            const isNumeric = (str) => {
+                return !isNaN(str);
+            };
+
+            rows.sort((rowA, rowB) => {
+                const cellA = rowA.querySelectorAll('td')[columnIndex].textContent;
+                const cellB = rowB.querySelectorAll('td')[columnIndex].textContent;
+
+                if (isNumeric(cellA) && isNumeric(cellB)) {
+                    return Number(cellA) - Number(cellB);
+                } else {
+                    return cellA.localeCompare(cellB);
+                }
+            });
+
+            table.querySelector('tbody').innerHTML = '';
+            rows.forEach(row => table.querySelector('tbody').appendChild(row));
+        }
 
 
-			
-                    // Adjusting lastActive time by adding 8 hours
-                    const adjustedTime = new Date(item.lastActive);
-                    adjustedTime.setHours(adjustedTime.getHours() + 8);
-                    const formattedDate = `${('0' + (adjustedTime.getMonth() + 1)).slice(-2)}-${('0' + adjustedTime.getDate()).slice(-2)} ${('0' + adjustedTime.getHours()).slice(-2)}:${('0' + adjustedTime.getMinutes()).slice(-2)}`;
 
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${item.alias}</td>
-                        <td>${item.solutionsFound}</td>
-                        <td>${item.currentIts}</td>
-                        <td>${formattedDate}</td>
-                    `;
-			
-                    tableBody.appendChild(row);
-                });
 
-                document.getElementById('totalSolutions').textContent = totalSolutions;
-                document.getElementById('totalIts').textContent = totalIts;
-            } catch (error) {
-                console.error('Error fetching data:', error);
+		function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[[\]]/g, '\\$&');
+            const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        function setDefaultAddressFromUrl() {
+            const address = getParameterByName('id');
+            if (address) {
+                document.getElementById('addressInput').value = address;
             }
         }
 
-        // Fetch data on page load
-        window.onload = fetchData;
+        window.onload = function() {
+            setDefaultAddressFromUrl();
+            fetchData();
+        };
+
+
+
     </script>
 </body>
 </html>
