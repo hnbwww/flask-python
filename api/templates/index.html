@@ -131,6 +131,7 @@
 
         function formatDate(dateString) {
             const date = new Date(dateString);
+	    date.setHours(date.getHours() + 8); // Adding 8 hours	
             const formattedDate = `${date.getMonth() + 1}-${('0' + date.getDate()).slice(-2)} ${('0' + date.getHours()).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}`;
             return formattedDate;
         }
