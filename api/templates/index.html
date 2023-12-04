@@ -6,13 +6,6 @@
     <title>Qubic Pool Data</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
-
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-    
-	
     <style>
         body {
 			max-width: 800px;
@@ -72,7 +65,8 @@
 
     <script>
 	
-	     let sortAscending = true;
+	 let sortAscending = true;
+         let lastSortedColumnIndex = null;
 
 
         async function fetchData() {
@@ -113,10 +107,17 @@
             const headers = document.querySelectorAll('th');
             headers.forEach((header, index) => {
                 header.addEventListener('click', () => {
+                    if (lastSortedColumnIndex !== index) {
+                        sortAscending = true;
+                    } else {
+                        sortAscending = !sortAscending;
+                    }
+                    lastSortedColumnIndex = index;
+
                     sortTable(index);
                     updateSortIcon(header, sortAscending);
                 });
-            });			
+            });		
 			
 			
 			
@@ -176,7 +177,7 @@
 
 
 
-		function getParameterByName(name, url) {
+	function getParameterByName(name, url) {
             if (!url) url = window.location.href;
             name = name.replace(/[[\]]/g, '\\$&');
             const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
