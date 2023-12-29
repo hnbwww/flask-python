@@ -78,7 +78,7 @@
         async function fetchData() {
             const address = document.getElementById('addressInput').value;
 
-            const response = await fetch(`https://flask-python-lemon.vercel.app/get_qb?ID=${address}`);
+            const response = await fetch(`/get_qb?ID=${address}`);
             const data = await response.json();
 
             const poolData = document.getElementById('poolData');
